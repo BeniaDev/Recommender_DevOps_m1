@@ -5,9 +5,13 @@ from sklearn.metrics import mean_squared_error
 from pathlib import Path
 
 from src.utils import get_rating_matrix, load_dataset
+import logging
+
+logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(message)s',
+                    datefmt='%d-%b-%y %H:%M:%S')
 
 class ALSRecommender():
-    def __init__(self, k=5, lmbda=0.1, max_epochs=15, error_metric='rmse', verbose=True):
+    def __init__(self, k=50, lmbda=0.1, max_epochs=15, error_metric='rmse', verbose=True):
         # Force integer in case it comes in as float
         self.k = int(np.round(k))
         self.lmbda = lmbda
@@ -89,7 +93,8 @@ class ALSRecommender():
             error = self._calc_train_error(self.U, self.I, self.R)
             self.train_errors.append(error)
             if self.verbose:
-                print("[Epoch {}/{}] train error: {}".format(self.epoch, self.max_epochs, error))
+                logging.info(f"[Epoch {self.epoch + 1}/{self.max_epochs}] train error: {error}")
+
             self.epoch += 1
 
         self.to_disk("./model/")
@@ -101,15 +106,17 @@ class ALSRecommender():
 
     def evaluate(self, dataset: Path):
         val_df = load_dataset(dataset=dataset)
-        self = self.warmup(model_path="./model/")
+        self = self.warmup()
 
         preds = self.predict(val_df[['user_id', 'movie_id']])
         val_err = mean_squared_error(preds, val_df['rating'], squared=False)
-        print(f"Validation RMSE: {val_err}")
+        logging.info(f"Validation RMSE: {val_err}")
 
-    def warmup(self, model_path: str):
-        with open(model_path + 'als_baseline_model.pickle', 'rb') as f:
+    def warmup(self, model_name: str='als_baseline_model.pickle'):
+        with open("./model/" + model_name, 'rb') as f:
             self = pickle.load(f)
+
+        logging.info(f"Model: {model_name} successfully loaded!")
 
         return self
 
@@ -117,6 +124,8 @@ class ALSRecommender():
         # Save the trained model as a pickle string.
         with open(save_path + 'als_baseline_model.pickle', 'wb') as f:
             pickle.dump(self, f)
+
+        logging.info("Model saved ./model/als_baseline_model.pickle \n\n\n")
 
     def predict(self, X):
         if not isinstance(X, pd.DataFrame):
@@ -138,7 +147,7 @@ class ALSRecommender():
         return X['rating'].values
 
     def recommend(self, user_id, m=10):
-        self = self.warmup(model_path="./model/")
+        self = self.warmup()
         train_df = load_dataset(self.train_df_path)
         train_df = train_df.iloc[:, :3].copy()
         train_df.columns = ['user', 'item', 'rating']
@@ -150,6 +159,8 @@ class ALSRecommender():
         user_movie_df['pred'] = self.predict(user_movie_df)
         user_movie_df = user_movie_df.sort_values('pred', ascending=False)
         movies, preds = user_movie_df[['item', 'pred']].values[:m, :].T
+        #TODO movies_id -> movie_names
+
         return movies, preds
 
     def find_similar(self):
