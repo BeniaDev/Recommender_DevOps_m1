@@ -8,7 +8,7 @@
 ### Train Model:
 * cli enabled :) =>
 ```
-foo@bar:~$ python3 model.py ----dataset=/path/to/train/dataset
+foo@bar:~$ python3 model.py --dataset=/path/to/train/dataset
 ```
 
 ### Evaluate:
