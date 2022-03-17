@@ -17,7 +17,7 @@ foo@bar:~$ python model.py evaluate --dataset=/path/to/evaluation/dataset
 ```
 
 
-###Deployment:
+### Deployment:
 1. With docker in progress to add docker image to registry
 2. Withour docker clone this repo and use ./app/
 
