@@ -12,7 +12,7 @@ logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s 
 
 
 class ALSRecommender():
-    def __init__(self, k=50, lmbda=0.1, max_epochs=15, error_metric='rmse', verbose=True):
+    def __init__(self, k=5, lmbda=0.1, max_epochs=20, error_metric='rmse', verbose=True):
         # Force integer in case it comes in as float
         self.k = int(np.round(k))
         self.lmbda = lmbda
@@ -29,7 +29,9 @@ class ALSRecommender():
             R_selector = (R > 0)
         R_hat = np.dot(U.T, I)
 
-        error = np.sqrt(np.sum(R_selector * (R_hat - R) * (R_hat - R)) / np.sum(R_selector))
+        error = np.sqrt(
+            np.sum(R_selector * (R_hat - R) * (R_hat - R) / np.sum(R_selector))
+        )
         return error
 
     def _fit_init(self, X: pd.DataFrame = None):
@@ -114,7 +116,7 @@ class ALSRecommender():
         logging.info(f"Validation RMSE: {val_err}")
 
     def warmup(self, model_name: str='als_baseline_model.pickle'):
-        with open("/model/" + model_name, 'rb') as f:
+        with open("./model/" + model_name, 'rb') as f:
             self = pickle.load(f)
 
         logging.info(f"Model: {model_name} successfully loaded!")

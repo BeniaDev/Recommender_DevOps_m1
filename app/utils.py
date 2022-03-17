@@ -34,7 +34,7 @@ def get_rating_matrix(X):
     return rating_matrix, user_map, item_map
 
 
-def load_dataset(dataset=Path('/data/ratings_train.dat')) -> pd.DataFrame:
+def load_dataset(dataset=Path('./data/ratings_train.dat')) -> pd.DataFrame:
     ratings_df = pd.read_csv(dataset, sep='::', header=None, names=['user_id', 'movie_id', 'rating', 'timestamp'])
     return ratings_df
 
