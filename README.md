@@ -3,7 +3,7 @@
 ## Creds:
 * Eugene Borisov, 971901 HITS, email: evgenyboriso@gmail.com
 
-##"How to"
+## "How to"
 
 ### Train Model:
 * cli enabled :) =>
