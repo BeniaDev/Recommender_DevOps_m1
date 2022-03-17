@@ -29,10 +29,12 @@ foo@bar:~$ python model.py evaluate --dataset=/path/to/evaluation/dataset
 * http://127.0.0.1:5001/api/reload
 
 
-# In progress: 
+# Progress: 
 - [x] Matrix baseline
+- [x] CLI application
 - [x] Worked Flask app with API
 - [x] Dockerfile with docker-compose.yaml
+- [ ] Little code refactoring
 - [ ] CI/CD part
 - [ ] Better Recommender Model 
 
