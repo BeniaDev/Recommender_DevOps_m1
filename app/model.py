@@ -4,7 +4,7 @@ import typer
 
 from typing import Optional
 from pathlib import Path
-from src.als_recommender import ALSRecommender
+from als_recommender import ALSRecommender
 
 logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S')
