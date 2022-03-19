@@ -3,6 +3,10 @@ from flask import Flask, request, jsonify, make_response
 from threading import Lock
 from model import predict, reload
 import json
+import logging
+
+logging.basicConfig(filename='../logs/app.log', level=logging.INFO, format='%(asctime)s - %(message)s',
+                    datefmt='%d-%b-%y %H:%M:%S')
 
 app = Flask(__name__)
 LOCK = Lock()
@@ -10,7 +14,7 @@ LOCK = Lock()
 
 @app.route('/api/log')
 def get_logs_tail():
-    with open("app.log", "r") as log_f:
+    with open("../logs/app.log", "r") as log_f:
         logs_tail = log_f.readlines()[-20:]
 
     if LOCK.locked():

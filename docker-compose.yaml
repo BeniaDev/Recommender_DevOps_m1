@@ -1,11 +1,12 @@
-version: '3.8'
+version: '3.9'
 services:
   matching:
     build: ./app/
     volumes:
-      - ./app/:/app/
+      - ./app/data/:/app/data/
+      - ./app/model/:/app/model/
+      - ./app/logs/:/app/logs/
     ports:
       - 5001:5000
     environment:
       -PORT: 5000
-      -FLASK_DEBUG: 1

@@ -5,6 +5,7 @@ from pathlib import Path
 def get_rating_matrix(X):
     user_col, item_col, rating_col = X.columns[:3]
     rating = X[rating_col]
+
     user_map = pd.Series(
         index=np.unique(X[user_col]),
         data=np.arange(X[user_col].nunique()),
@@ -34,7 +35,7 @@ def get_rating_matrix(X):
     return rating_matrix, user_map, item_map
 
 
-def load_dataset(dataset=Path('./data/ratings_train.dat')) -> pd.DataFrame:
+def load_dataset(dataset=Path('../data/ratings_train.dat')) -> pd.DataFrame:
     ratings_df = pd.read_csv(dataset, sep='::', header=None, names=['user_id', 'movie_id', 'rating', 'timestamp'])
     return ratings_df
 

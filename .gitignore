@@ -1,2 +1,2 @@
-app/app.log
+app/logs/app.log
 /app/model/als_baseline_model.pickle
