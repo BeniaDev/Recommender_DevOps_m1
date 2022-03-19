@@ -38,3 +38,6 @@ foo@bar:~$ python model.py evaluate --dataset=/path/to/evaluation/dataset
 - [ ] CI/CD part
 - [ ] Better Recommender Model 
 
+# Used materials:
+* https://docs.docker.com/ci-cd/github-actions/
+
