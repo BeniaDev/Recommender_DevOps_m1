@@ -30,4 +30,4 @@ jobs:
         with:
           context: ./app/
           push: true
-          tags: {{ secrets.DOCKER_HUB_USERNAME }}/recommender_sys:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/recommender_sys:latest
