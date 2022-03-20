@@ -34,10 +34,10 @@ foo@bar:~$ python model.py evaluate --dataset=/path/to/evaluation/dataset
 - [x] CLI application
 - [x] Worked Flask app with API
 - [x] Dockerfile with docker-compose.yaml
-- [ ] Little code refactoring
-- [ ] CI/CD part
+- [x] Little code refactoring
+- [x] CI/CD part
 - [ ] Better Recommender Model 
 
 # Used materials:
 * https://docs.docker.com/ci-cd/github-actions/
-
+* https://stackoverflow.com/questions/41984399/denied-requested-access-to-the-resource-is-denied-docker (how to correct push docker image)
