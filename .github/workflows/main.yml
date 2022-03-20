@@ -6,16 +6,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: docker login
-      env:
-        DOCKER_USER: ${{ secrets.DOCKER_USER }}   
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
-      run: |
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - name: docker build
-      run: |
-        docker build ./app sys_recommender
-    - name: docker push
-      run: |
-        docker push ${{ secrets.DOCKER_USER }}/sys_recommender:latest
+      - name: Check Out Repo 
+        uses: actions/checkout@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: docker build
+        run: |
+          docker build ./app sys_recommender
+      - name: docker push
+        run: |
+          docker push ${{ secrets.DOCKER_USER }}/sys_recommender:latest
+          
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
