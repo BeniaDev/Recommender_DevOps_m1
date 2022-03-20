@@ -15,10 +15,10 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
     - name: docker_build
       run: |
-        docker build ./app -t sys_recommender:1.0.0
+        docker build ./app -t sys_recommender:latest
     - name: docker push
       run: |
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/sys_recommender:1.0.0
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/sys_recommender:latest
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
