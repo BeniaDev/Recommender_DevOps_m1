@@ -18,7 +18,7 @@ jobs:
         docker build ./app -t sys_recommender:1.0.0
     - name: docker push
       run: |
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/sys_recommender:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/sys_recommender:1.0.0
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
