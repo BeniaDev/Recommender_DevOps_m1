@@ -41,3 +41,4 @@ foo@bar:~$ python model.py evaluate --dataset=/path/to/evaluation/dataset
 # Used materials:
 * https://docs.docker.com/ci-cd/github-actions/
 * https://stackoverflow.com/questions/41984399/denied-requested-access-to-the-resource-is-denied-docker (how to correct push docker image)
+* https://github.com/marketplace/actions/build-and-push-docker-images
