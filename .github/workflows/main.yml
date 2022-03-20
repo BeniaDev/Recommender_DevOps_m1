@@ -15,7 +15,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: docker build
         run: |
-          docker build ./app sys_recommender
+          docker build ./app -t sys_recommender:1.0.0
       - name: docker push
         run: |
           docker push ${{ secrets.DOCKER_USER }}/sys_recommender:latest
