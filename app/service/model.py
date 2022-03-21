@@ -34,7 +34,7 @@ def evaluate(dataset: Optional[Path] = Path("../data/ratings_test.dat")):
 
 
 @app.command()
-def predict(user_id: Optional[str], M: Optional[str]=10):
+def predict(user_id: Optional[str]=100, M: Optional[str]=10):
     """
     API call to model.recommend()
     :param user_id: user id in System

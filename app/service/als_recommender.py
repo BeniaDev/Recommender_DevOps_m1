@@ -32,7 +32,7 @@ class ALSRecommender():
         R_hat = np.dot(U.T, I)
 
         error = np.sqrt(
-            np.sum(R_selector * (R_hat - R) * (R_hat - R) / np.sum(R_selector))
+            np.sum(R_selector * (R_hat - R) * (R_hat - R)) / np.sum(R_selector)
         )
         return error
 
@@ -147,11 +147,13 @@ class ALSRecommender():
             np.sum(self.U[:, u_ind] * self.I[:, i_ind])
             for u_ind, i_ind in zip(user_inds, item_inds)
         ])
-
-        #return mean
-        # rating_pred += self.train_mean
-
         X.loc[known_user_and_item_mask, 'rating'] = rating_pred
+        X.loc[~known_user_and_item_mask, 'rating'] = self.train_mean
+        min_rating = np.min(self.R[np.nonzero(self.R)])
+        max_rating = np.max(self.R)
+        X.loc[X['rating'] < min_rating, 'rating'] = min_rating
+        X.loc[X['rating'] > max_rating, 'rating'] = max_rating
+
         return X['rating'].values
 
     def train(self, dataset: Path):
