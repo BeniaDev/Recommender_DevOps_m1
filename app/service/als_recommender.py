@@ -13,7 +13,7 @@ logging.basicConfig(filename='../logs/app.log', level=logging.INFO, format='%(as
 
 
 class ALSRecommender():
-    def __init__(self, k=5, lmbda=0.1, max_epochs=20, error_metric='rmse', verbose=True):
+    def __init__(self, k=50, lmbda=0.1, max_epochs=15, error_metric='rmse', verbose=True):
         # Force integer in case it comes in as float
         self.k = int(np.round(k))
         self.lmbda = lmbda
@@ -30,7 +30,6 @@ class ALSRecommender():
         if R_selector is None:
             R_selector = (R > 0)
         R_hat = np.dot(U.T, I)
-        R_hat = R_hat + np.mean(R, axis=1).reshape(-1, 1)
 
         error = np.sqrt(
             np.sum(R_selector * (R_hat - R) * (R_hat - R) / np.sum(R_selector))
@@ -54,6 +53,21 @@ class ALSRecommender():
         self.initialized = True
 
     def fit(self, X: pd.DataFrame, n_epochs: int = None):
+        """Fit model to training data X. If at least one iteration has already been run,
+        then the model will continue from its most recent state.
+
+        Parameters
+        ----------
+        X : pandas DataFrame, shape=(n_ratings, >=3)
+            First 3 columns must correspond to user, item, and rating in that order
+        n_epochs : int, optional
+            Number of iterations to run. If not provided, will run for self.max_epochs
+
+        Returns
+        -------
+        self
+            This allows chaining like `ALSRecommender().fit(X_train).predict(X_test)`
+        """
         if n_epochs is None:
             self.initialized = False
         if not self.initialized:
@@ -105,20 +119,19 @@ class ALSRecommender():
 
         self.to_disk("../model/")
 
-    def train(self, dataset: Path):
-        df = load_dataset(dataset=dataset)
-        self.train_df_path = dataset
-        self.fit(df)
-
-    def evaluate(self, dataset: Path):
-        val_df = load_dataset(dataset=dataset)
-        self = self.warmup()
-
-        preds = self.predict(val_df[['user_id', 'movie_id']])
-        val_err = mean_squared_error(preds, val_df['rating'], squared=False)
-        logging.info(f"Validation RMSE: {val_err}")
-
     def predict(self, X):
+        """Generate predictions for user/item pairs
+
+        Parameters
+        ----------
+        X : pandas dataframe, shape = (n_pairs, 2)
+            User, item dataframe
+
+        Returns
+        -------
+        rating_pred : 1d numpy array, shape = (n_pairs,)
+            Array of rating predictions for each user/item pair
+        """
         if not isinstance(X, pd.DataFrame):
             raise ValueError("X must be a DataFrame")
         X = X.copy()
@@ -136,12 +149,43 @@ class ALSRecommender():
         ])
 
         #return mean
-        rating_pred += self.train_mean
+        # rating_pred += self.train_mean
 
         X.loc[known_user_and_item_mask, 'rating'] = rating_pred
         return X['rating'].values
 
-    def recommend(self, user_id, m=10):
+    def train(self, dataset: Path):
+        """
+        Call model.fit(df)
+        :param dataset: path to train dataset
+        :return: None
+        Log results in /app/logs/app.log
+        """
+        df = load_dataset(dataset=dataset)
+        self.train_df_path = dataset
+        self.fit(df)
+
+    def evaluate(self, dataset: Path):
+        """
+        Warmup model from /app/model/ and count RMSE on validation dataset
+        :param dataset:  path to validation dataset
+        :return: None
+        Log results in /app/logs/app.log
+        """
+        val_df = load_dataset(dataset=dataset)
+        self = self.warmup()
+
+        preds = self.predict(val_df[['user_id', 'movie_id']])
+        val_err = mean_squared_error(preds, val_df['rating'], squared=False)
+        logging.info(f"Validation RMSE: {val_err}")
+
+    def recommend(self, user_id: int, m: int=10):
+        """
+        Generate trained model m recommendations for user by him user_id
+        :param user_id: User Id in System DB
+        :param m: Count of Recommended Movies
+        :return: (movie_id_list, predicted_ratings_list)
+        """
         self = self.warmup()
         train_df = load_dataset(self.train_df_path)
         train_df = train_df.iloc[:, :3].copy()
@@ -154,6 +198,7 @@ class ALSRecommender():
         user_movie_df['pred'] = self.predict(user_movie_df)
         user_movie_df = user_movie_df.sort_values('pred', ascending=False)
         movies, preds = user_movie_df[['item', 'pred']].values[:m, :].T
+
         #TODO movies_id -> movie_names
 
         return movies, preds
@@ -162,6 +207,11 @@ class ALSRecommender():
         pass
 
     def warmup(self, model_name: str='als_baseline_model.pickle'):
+        """
+        Reload model from /app/model/
+        :param model_name: model name from /app/model/
+        :return None
+        """
         with open("../model/" + model_name, 'rb') as f:
             self = pickle.load(f)
 
@@ -170,7 +220,11 @@ class ALSRecommender():
         return self
 
     def to_disk(self, save_path: str):
-        # Save the trained model as a pickle string.
+        """
+        Save model file as .pickle to disk
+        :param save_path: path to save model (default: /app/model/)
+        :return: None
+        """
         with open(save_path + 'als_baseline_model.pickle', 'wb') as f:
             pickle.dump(self, f)
 
